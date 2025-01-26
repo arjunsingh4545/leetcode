@@ -18,8 +18,7 @@ class Solution {
 		cell& c = cells[i][j];
 		if (c.value == v)
 			return true;
-		if (c.constraints[v])
-			return false;
+		if (c.constraints.test(v)) return false;
 		c.constraints = bitset<10>(0x3FE); // all 1s
 		c.constraints.reset(v);
 		c.numPossibilities = 1;
