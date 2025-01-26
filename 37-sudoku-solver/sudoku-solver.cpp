@@ -59,7 +59,7 @@ class Solution {
 				return set(i, j, v);
 			}
 		}
-		assert(false);
+		return false;
 	}
 
 	// backtracking state - list of empty cells
