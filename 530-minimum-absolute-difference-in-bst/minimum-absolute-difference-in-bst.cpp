@@ -10,23 +10,29 @@
  * };
  */
 class Solution {
-    void inOrderTraversal(TreeNode* root, vector<int>& values) {
-        if (root == nullptr) return;
-        inOrderTraversal(root->left, values);
-        values.push_back(root->val);
-        inOrderTraversal(root->right, values);
-    }
-
 public:
     int getMinimumDifference(TreeNode* root) {
-        vector<int> values;
-        inOrderTraversal(root, values);
-        
-        int minDiff = INT_MAX;
-        for (int i = 1; i < values.size(); ++i) {
-            minDiff = min(minDiff, values[i] - values[i - 1]);
+        queue<TreeNode*> q;
+        vector<int> val;
+        q.push(root);
+        while(!q.empty()) {
+            auto curr = q.front();
+            q.pop();
+            val.push_back(curr->val);
+            if(curr->left) {
+                q.push(curr->left);
+            } 
+            if(curr->right) {
+                q.push(curr->right);
+            }
         }
-        
+
+        sort(val.begin() , val.end());
+
+        int minDiff = INT_MAX;
+        for(int i=1 ; i < val.size() ; i++) {
+            minDiff = std::min(minDiff , val[i] - val[i-1]);
+        }
         return minDiff;
     }
 };
