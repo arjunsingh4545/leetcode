@@ -18,9 +18,7 @@ class FindElements {
     int rightVal(int x) {
         return 2*x+2;
     }
-    
-public:
-    FindElements(TreeNode* root) {
+    void bfs(TreeNode* root) {
         if(root != nullptr) {
             root->val = 0;
             values.insert(root->val);
@@ -44,6 +42,11 @@ public:
                 }
             }
         }
+    }
+public:
+    FindElements(TreeNode* root) {
+        //bfs
+        bfs(root);
     }
     
     bool find(int target) {
