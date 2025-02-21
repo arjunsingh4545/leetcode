@@ -9,6 +9,7 @@
  *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
  * };;
  */
+ //bfs approach
 class FindElements {
     unordered_set<int> values;
     int leftVal(int x) {
@@ -18,23 +19,31 @@ class FindElements {
         return 2*x+2;
     }
     
-    void makeBinary(TreeNode* root , int x) {
-        root->val = x;
-        values.insert(x);
-
-        if(root->left != nullptr) {
-            makeBinary(root->left , leftVal(x));
-        }
-
-        if(root->right != nullptr) {
-            makeBinary(root->right , rightVal(x));
-        }
-    }
-
-    
 public:
     FindElements(TreeNode* root) {
-        if(root != nullptr) makeBinary(root , 0);
+        if(root != nullptr) {
+            root->val = 0;
+            values.insert(root->val);
+
+            queue<TreeNode*> q;
+            q.push(root);
+            while(!q.empty()) {
+                TreeNode* curr = q.front();
+                q.pop();
+
+                if(curr->left != nullptr) {
+                    curr->left->val = leftVal(curr->val);
+                    values.insert(curr->left->val);
+                    q.push(curr->left);
+                }
+
+                if(curr->right != nullptr) {
+                    curr->right->val = rightVal(curr->val);
+                    values.insert(curr->right->val);
+                    q.push(curr->right);
+                }
+            }
+        }
     }
     
     bool find(int target) {
