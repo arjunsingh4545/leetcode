@@ -19,22 +19,30 @@ public:
 class Solution {
 public:
     Node* connect(Node* root) {
-        if(!root) return root;
-        queue<Node*>q;
-        q.push(root);
+       if (!root) return root; // If the tree is empty, return null
 
-        while(!q.empty()) {
-            int n = q.size();
-            for(int i=0 ; i < n ; i++) {
-                Node* curr = q.front();
-                q.pop();
+        Node* current = root; // Start with the root node
 
-                if(i < n-1) curr->next = q.front();
+        while (current->left) { // Traverse levels
+            Node* temp = current; // Use a temporary pointer to traverse the current level
 
-                if(curr->left) q.push(curr->left);
-                if(curr->right) q.push(curr->right);
+            while (temp) { // Traverse nodes in the current level
+                // Connect the left child to the right child
+                temp->left->next = temp->right;
+
+                // Connect the right child to the next node's left child, if it exists
+                if (temp->next) {
+                    temp->right->next = temp->next->left;
+                }
+
+                // Move to the next node in the current level
+                temp = temp->next;
             }
+
+            // Move to the next level
+            current = current->left;
         }
-        return root;
+
+        return root; 
     }
 };
