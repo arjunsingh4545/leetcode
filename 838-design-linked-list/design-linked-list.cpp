@@ -1,19 +1,20 @@
 class LinkedListNode {
 public:
     int data;
-    LinkedListNode* next;
+    std::shared_ptr<LinkedListNode> next;
 
     LinkedListNode(int data) : data(data), next(nullptr) {}
 };
 
+
 class MyLinkedList {
 private:
-    LinkedListNode* head;
-    LinkedListNode* tail; // new
+    std::shared_ptr<LinkedListNode> head;
+    std::shared_ptr<LinkedListNode> tail;
     int listSize;
 
-    LinkedListNode* goToIndex(int index) {
-        LinkedListNode* curr = head;
+    std::shared_ptr<LinkedListNode> goToIndex(int index) {
+        auto curr = head;
         for (int i = 0; i < index && curr; ++i)
             curr = curr->next;
         return curr;
@@ -28,15 +29,15 @@ public:
     }
 
     void addAtHead(int val) {
-        LinkedListNode* newNode = new LinkedListNode(val);
+        auto newNode = std::make_shared<LinkedListNode>(val);
         newNode->next = head;
         head = newNode;
-        if (listSize == 0) tail = head; // initialize tail
+        if (listSize == 0) tail = head;
         listSize++;
     }
 
     void addAtTail(int val) {
-        LinkedListNode* newNode = new LinkedListNode(val);
+        auto newNode = std::make_shared<LinkedListNode>(val);
         if (!head) {
             head = tail = newNode;
         } else {
@@ -59,8 +60,8 @@ public:
             return;
         }
 
-        LinkedListNode* prev = goToIndex(index - 1);
-        LinkedListNode* newNode = new LinkedListNode(val);
+        auto prev = goToIndex(index - 1);
+        auto newNode = std::make_shared<LinkedListNode>(val);
         newNode->next = prev->next;
         prev->next = newNode;
         listSize++;
@@ -70,28 +71,17 @@ public:
         if (index < 0 || index >= listSize) return;
 
         if (index == 0) {
-            LinkedListNode* temp = head;
             head = head->next;
-            delete temp;
-            if (listSize == 1) tail = nullptr; // clear tail if list is empty
+            if (listSize == 1) tail = nullptr;
         } else {
-            LinkedListNode* prev = goToIndex(index - 1);
-            LinkedListNode* nodeToDelete = prev->next;
+            auto prev = goToIndex(index - 1);
+            auto nodeToDelete = prev->next;
             prev->next = nodeToDelete->next;
-            if (nodeToDelete == tail) tail = prev; // update tail if last node is deleted
-            delete nodeToDelete;
+            if (nodeToDelete == tail) tail = prev;
         }
 
         listSize--;
     }
 
-
-    ~MyLinkedList() {
-        while (head) {
-            LinkedListNode* temp = head;
-            head = head->next;
-            delete temp;
-        }
-        tail = nullptr;
-    }
+    // Smart pointers handle destruction automatically
 };
