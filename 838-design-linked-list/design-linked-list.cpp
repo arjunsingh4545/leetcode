@@ -1,22 +1,21 @@
 class LinkedListNode {
 public:
     int data;
-    std::shared_ptr<LinkedListNode> next;
+    std::unique_ptr<LinkedListNode> next;
 
     LinkedListNode(int data) : data(data), next(nullptr) {}
 };
 
-
 class MyLinkedList {
 private:
-    std::shared_ptr<LinkedListNode> head;
-    std::shared_ptr<LinkedListNode> tail;
+    std::unique_ptr<LinkedListNode> head;
+    LinkedListNode* tail; // raw pointer to tail (non-owning)
     int listSize;
 
-    std::shared_ptr<LinkedListNode> goToIndex(int index) {
-        auto curr = head;
+    LinkedListNode* goToIndex(int index) {
+        LinkedListNode* curr = head.get();
         for (int i = 0; i < index && curr; ++i)
-            curr = curr->next;
+            curr = curr->next.get();
         return curr;
     }
 
@@ -29,41 +28,37 @@ public:
     }
 
     void addAtHead(int val) {
-        auto newNode = std::make_shared<LinkedListNode>(val);
-        newNode->next = head;
-        head = newNode;
-        if (listSize == 0) tail = head;
+        auto newNode = std::make_unique<LinkedListNode>(val);
+        if (!head) tail = newNode.get();
+        newNode->next = std::move(head);
+        head = std::move(newNode);
         listSize++;
     }
 
     void addAtTail(int val) {
-        auto newNode = std::make_shared<LinkedListNode>(val);
+        auto newNode = std::make_unique<LinkedListNode>(val);
+        LinkedListNode* newTail = newNode.get();
+
         if (!head) {
-            head = tail = newNode;
+            head = std::move(newNode);
+            tail = newTail;
         } else {
-            tail->next = newNode;
-            tail = newNode;
+            tail->next = std::move(newNode);
+            tail = newTail;
         }
+
         listSize++;
     }
 
     void addAtIndex(int index, int val) {
         if (index < 0 || index > listSize) return;
+        if (index == 0) return addAtHead(val);
+        if (index == listSize) return addAtTail(val);
 
-        if (index == 0) {
-            addAtHead(val);
-            return;
-        }
-
-        if (index == listSize) {
-            addAtTail(val);
-            return;
-        }
-
-        auto prev = goToIndex(index - 1);
-        auto newNode = std::make_shared<LinkedListNode>(val);
-        newNode->next = prev->next;
-        prev->next = newNode;
+        LinkedListNode* prev = goToIndex(index - 1);
+        auto newNode = std::make_unique<LinkedListNode>(val);
+        newNode->next = std::move(prev->next);
+        prev->next = std::move(newNode);
         listSize++;
     }
 
@@ -71,17 +66,25 @@ public:
         if (index < 0 || index >= listSize) return;
 
         if (index == 0) {
-            head = head->next;
+            head = std::move(head->next);
             if (listSize == 1) tail = nullptr;
         } else {
-            auto prev = goToIndex(index - 1);
-            auto nodeToDelete = prev->next;
-            prev->next = nodeToDelete->next;
-            if (nodeToDelete == tail) tail = prev;
+            LinkedListNode* prev = goToIndex(index - 1);
+            auto nodeToDelete = std::move(prev->next);
+            prev->next = std::move(nodeToDelete->next);
+            if (index == listSize - 1) tail = prev;
         }
 
         listSize--;
     }
 
-    // Smart pointers handle destruction automatically
+    void printList() {
+        LinkedListNode* curr = head.get();
+        while (curr) {
+            std::cout << curr->data << " -> ";
+            curr = curr->next.get();
+        }
+        std::cout << "null\n";
+    }
 };
+
